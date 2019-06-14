@@ -10,7 +10,7 @@ f = open('names_2.txt', 'r')
 names_2 = set(f.read().split("\n"))  # List containing 10000 names
 f.close()
 
-# Given code was roughly O(n^2), though I suppose technically it's O(n*m)
+end_time = time.time()
 
 class BinarySearchTree:
     def __init__(self, value):
@@ -72,6 +72,8 @@ class BinarySearchTree:
                 node = node.left
         return False
 
+# BST SOLUTION
+
 # name_tree = BinarySearchTree(None)
 # for name in names_1: # O(n)
 #     name_tree.insert(name.lower()) # log(n)
@@ -80,17 +82,73 @@ class BinarySearchTree:
 #     if(name_tree.contains(name.lower())):
 #         duplicates.append(name) # log(n)
 
-end_time = time.time()
 
-names = {}
+# DICT SOLUTION
+
+# names = {}
+# for name in names_1:
+#     if(not name in names):
+#         names[name] = True
+# duplicates = []
+# for name in names_2:
+#     if(name in names):
+#         duplicates.append(name)
+
+# Stretch Solution
+
+def insert_index(arr, name):
+    if(not len(arr) or name < arr[0]):
+        return 0
+    elif(name > arr[len(arr)-1]):
+        return len(arr)
+    start = 0
+    end = len(arr)-1
+    while(True):
+        half = round((start + end) / 2)
+        if(arr[half] > name and arr[half-1] < name):
+            return half
+        elif(arr[half]<name and arr[half+1] > name):
+            return half + 1
+        elif(arr[half] > name):
+            end = half
+        elif(arr[half] < name):
+            start = half
+
+def find_name(arr, name):
+    if(not len(arr) or name < arr[0] or name > arr[len(arr)-1]):
+        return False
+    start = 0
+    end = len(arr)-1
+    while(True):
+        half = round((start + end) / 2)
+        if((arr[half] > name and arr[half-1] < name) or (arr[half] < name and arr[half+1] > name)):
+            return False
+        elif(arr[half] == name):
+            return True
+        elif(arr[half] > name):
+            end = half
+        elif(arr[half] < name):
+            start = half
+
+name_list = []
 for name in names_1:
-    if(not name in names):
-        names[name] = True
+    if(not name in name_list):
+        if(not len(name_list)):
+            name_list.append(name.lower())
+        else:
+            index = insert_index(name_list, name.lower())
+            if(index > len(name_list)-1):
+                name_list.append(name.lower())
+            else:
+                name_list.insert(index, name.lower())
+
 duplicates = []
 for name in names_2:
-    if(name in names):
+    if(find_name(name_list, name.lower())):
         duplicates.append(name)
 
+
+    
 print (f"{len(duplicates)} duplicates:\n\n{', '.join(duplicates)}\n\n")
 print (f"runtime: {end_time - start_time} seconds")
 
